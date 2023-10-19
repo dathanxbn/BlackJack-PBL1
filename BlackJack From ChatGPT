@@ -1,0 +1,84 @@
+function blackjack()
+    % Initialize the deck and player's hand
+    deck = [1:10, 10, 10, 10, 1:10, 10, 10, 10, 1:10, 10, 10, 10, 1:10, 10, 10, 10, 1:10, 10, 10, 10];
+    playerHand = [];
+    
+    % Deal the initial two cards to the player
+    for i = 1:2
+        playerHand = [playerHand, dealCard(deck)];
+    end
+    
+    % Display the player's hand and calculate the total
+    displayHand(playerHand);
+    playerTotal = calculateTotal(playerHand);
+    
+    % Main game loop
+    while playerTotal <= 21
+        choice = input('Do you want to "hit" or "stand"? ', 's');
+        
+        if strcmpi(choice, 'hit')
+            playerHand = [playerHand, dealCard(deck)];
+            displayHand(playerHand);
+            playerTotal = calculateTotal(playerHand);
+        elseif strcmpi(choice, 'stand')
+            break;
+        else
+            disp('Invalid input. Please enter "hit" or "stand".');
+        end
+    end
+    
+    % Dealer's turn
+    dealerHand = [];
+    while calculateTotal(dealerHand) < 17
+        dealerHand = [dealerHand, dealCard(deck)];
+    end
+    
+    % Display the dealer's hand and calculate the total
+    displayHand(dealerHand);
+    dealerTotal = calculateTotal(dealerHand);
+    
+    % Determine the winner
+    determineWinner(playerTotal, dealerTotal);
+end
+
+
+function card = dealCard(deck)
+    % Deal a random card from the deck
+    randomIndex = randi(length(deck));
+    card = deck(randomIndex);
+    deck(randomIndex) = [];
+end
+
+function displayHand(hand)
+    % Display the player's or dealer's hand
+    disp('Hand:');
+    disp(hand);
+    disp(['Total: ', num2str(calculateTotal(hand))]);
+end
+
+function total = calculateTotal(hand)
+    % Calculate the total value of a hand, considering Aces
+    numAces = sum(hand == 1);
+    total = sum(hand);
+    
+    % Adjust for Aces (Aces can be 1 or 11)
+    while total > 21 && numAces > 0
+        total = total - 10;
+        numAces = numAces - 1;
+    end
+end
+
+function determineWinner(playerTotal, dealerTotal)
+    % Determine the winner and display the result
+    disp('Player Total: ' + string(playerTotal));
+    disp('Dealer Total: ' + string(dealerTotal));
+    
+    if playerTotal > 21 || (dealerTotal <= 21 && dealerTotal > playerTotal)
+        disp('Dealer wins!');
+    elseif dealerTotal > 21 || playerTotal > dealerTotal
+        disp('Player wins!');
+    else
+        disp('Its a tie!');
+    end
+end
+
